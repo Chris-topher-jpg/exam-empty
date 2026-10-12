@@ -65,7 +65,7 @@ before(async () => {
       await new Promise((resolve) => setTimeout(resolve, 20));
       return new Response(raw, { headers: headers(raw) });
     }
-    const raw = JSON.stringify(success(createdOrder, queryPaid ? {} : { trade_state: "NOTPAY", transaction_id: undefined, success_time: undefined }));
+    const raw = JSON.stringify(success(createdOrder, queryPaid ? {} : { trade_state: "NOTPAY", trade_type: undefined, transaction_id: undefined, success_time: undefined }));
     return new Response(raw, { headers: headers(raw) });
   };
   ({ server } = await import("../server.js"));

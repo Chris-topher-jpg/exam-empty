@@ -87,6 +87,8 @@ test("wrong merchant, AppID, amount, currency, order or transaction cannot unloc
     assert.equal(order.status, "pending");
   }
   assert.equal(applyWechatTransaction(client, transaction({ trade_state: "NOTPAY" }), payment()), false);
+  assert.equal(applyWechatTransaction(client, transaction({ trade_state: "NOTPAY", trade_type: undefined }), payment()), false);
+  assert.throws(() => applyWechatTransaction(client, transaction({ trade_type: undefined }), payment()));
 });
 
 test("signed query errors are safe to classify; unsigned errors are rejected", async () => {
