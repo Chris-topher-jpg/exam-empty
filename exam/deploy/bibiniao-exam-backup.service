@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up Bibiniao exam business data
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/bibiniao-exam/current/deploy/backup.sh
+UMask=0077

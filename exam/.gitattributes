@@ -1,0 +1,2 @@
+# Keep Linux deployment artifacts executable when archived from Windows Git.
+deploy/** text eol=lf

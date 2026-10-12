@@ -1,0 +1,8 @@
+data/state.json
+data/config.json
+data/admin-users.json
+data/payment-qr.*
+data/question-bank.json
+node_modules/
+*.tar.gz
+.DS_Store

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="请在管理员后台上传收款码">
+  <rect width="600" height="600" rx="32" fill="#f7f8fa"/>
+  <rect x="38" y="38" width="524" height="524" rx="24" fill="none" stroke="#c8cdd5" stroke-width="5"/>
+  <g fill="#172233">
+    <rect x="92" y="92" width="130" height="130" rx="8"/><rect x="378" y="92" width="130" height="130" rx="8"/><rect x="92" y="378" width="130" height="130" rx="8"/>
+    <rect x="126" y="126" width="62" height="62" fill="#f7f8fa"/><rect x="412" y="126" width="62" height="62" fill="#f7f8fa"/><rect x="126" y="412" width="62" height="62" fill="#f7f8fa"/>
+    <path d="M276 94h36v36h-36zM246 148h36v36h-36zM306 148h52v36h-52zM246 202h36v54h-36zM312 204h40v36h-40zM360 244h36v36h-36zM252 286h58v36h-58zM330 286h36v72h-36zM386 290h36v36h-36zM438 286h54v36h-54zM244 354h36v36h-36zM292 366h36v72h-36zM346 378h36v36h-36zM400 354h36v36h-36zM448 366h54v36h-54zM246 444h36v54h-36zM306 456h36v36h-36zM360 438h36v72h-36zM414 438h36v36h-36zM462 450h36v48h-36z"/>
+  </g>
+  <rect x="136" y="252" width="328" height="94" rx="47" fill="#ffffff" stroke="#d7dce4"/>
+  <text x="300" y="294" text-anchor="middle" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="700" fill="#172233">请管理员上传真实收款码</text>
+  <text x="300" y="324" text-anchor="middle" font-family="Arial, PingFang SC, Microsoft YaHei, sans-serif" font-size="15" fill="#7b8493">后台设置 · 收款码</text>
+</svg>
+

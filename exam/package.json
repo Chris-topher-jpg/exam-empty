@@ -1,0 +1,16 @@
+{
+  "name": "jlb-entry-exam",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "俱乐部入职文考与收款确认系统",
+  "scripts": {
+    "import:questions": "python3 scripts/import-word-bank.py '条例+下单须知.docx' data/question-bank.json",
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

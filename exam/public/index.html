@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f7f2">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <title>比比鸟电竞 · 俱乐部入职文考</title>
+  <link rel="stylesheet" href="/app.css?v=20260922-1">
+</head>
+<body class="written-exam-page">
+  <header class="exam-site-header branded-site-header">
+    <div class="exam-brand"><img class="club-logo" src="/club-logo.png" alt="比比鸟电竞俱乐部图标" width="512" height="471"><div><b id="brandName">比比鸟电竞</b><span>入职资格考试</span></div></div>
+    <a href="/certificate">查证明</a>
+  </header>
+
+  <main class="exam-home" id="app">
+    <section class="exam-intro">
+      <p class="exam-section-no">ENTRY EXAMINATION / 01</p>
+      <h1 id="examTitle">俱乐部入职文考</h1>
+      <p>请在安静、网络稳定的环境中独立完成。系统将随机组卷，提交后不能修改。</p>
+      <dl>
+        <div><dt>题量</dt><dd id="questionCount">30 题</dd></div>
+        <div><dt>时长</dt><dd id="examMinutes">10 分钟</dd></div>
+        <div><dt>通过线</dt><dd id="passScore">85 分</dd></div>
+        <div><dt>机会</dt><dd id="maxAttempts">6 次</dd></div>
+      </dl>
+    </section>
+
+    <section id="resumeExamView" class="resume-exam-section hidden" aria-live="polite">
+      <div>
+        <span>未完成的考试</span>
+        <strong id="resumeExamTitle">可以继续上次答题</strong>
+        <small id="resumeExamMeta">正在检查考试状态</small>
+      </div>
+      <button class="primary-action" id="resumeExamButton" type="button">继续答题</button>
+    </section>
+
+    <section id="setupView" class="registration-section">
+      <div class="section-heading"><span>报名信息</span><small>信息将用于考试记录和通过证明</small></div>
+      <form id="candidateForm">
+        <label><span>姓名 / 入职昵称</span><input id="candidateName" name="candidateName" required maxlength="30" autocomplete="name" placeholder="请填写真实信息"></label>
+        <label><span>东东数字ID</span><input id="candidateId" name="candidateId" required maxlength="50" placeholder="请输入东东数字ID"></label>
+        <label><span>联系方式 <i>选填</i></span><input id="contact" name="contact" maxlength="50" placeholder="付款异常时联系"></label>
+        <label class="answer-code-field"><span>答题码 <i>选填</i></span><input id="answerCode" name="answerCode" maxlength="40" autocomplete="off" placeholder="有答题码可免支付直接开考"><small>答题码由管理员生成，使用后仍会计入本次考试次数。</small></label>
+        <div id="candidateStatus" class="notice info hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+        <div class="form-actions">
+          <button class="secondary-action" id="lookupButton" type="button">查询次数</button>
+          <button class="secondary-action code-action" id="redeemAnswerCodeButton" type="button">使用答题码</button>
+          <button class="primary-action" type="submit">确认报名</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="paymentView" class="payment-section hidden">
+      <div class="section-heading"><span>等待付款确认</span><small id="paymentAttempt">第 1 次考试</small></div>
+      <div class="payment-body">
+        <div class="qr-column" aria-label="考试收款码">
+          <div class="payment-qr-grid">
+            <figure class="payment-method">
+              <img id="paymentWechatQr" class="payment-qr" src="/payment-wechat.jpg" alt="微信收款码">
+              <figcaption>微信支付</figcaption>
+              <a id="savePaymentQr" class="qr-save-button" href="/payment-wechat.jpg" download="比比鸟电竞-微信收款码.jpg">保存微信收款码</a>
+            </figure>
+            <figure class="payment-method">
+              <img id="paymentAlipayQr" class="payment-qr" src="/payment-alipay.jpg" alt="支付宝收款码">
+              <figcaption>支付宝</figcaption>
+              <a id="saveAlipayQr" class="qr-save-button" href="/payment-alipay.jpg" download="比比鸟电竞-支付宝收款码.jpg">保存支付宝收款码</a>
+            </figure>
+          </div>
+          <span class="qr-caption">请按页面显示金额扫码付款，付款后点击下方按钮刷新状态</span>
+        </div>
+        <div class="payment-details">
+          <p id="paymentInstructions">请按页面显示金额扫码付款，付款后等待系统确认。</p>
+          <strong id="paymentAmount">-</strong>
+          <dl>
+            <div><dt>考生</dt><dd id="paymentCandidate">-</dd></div>
+            <div><dt>付款单号</dt><dd id="paymentId">-</dd></div>
+            <div><dt>状态</dt><dd id="paymentStatus" role="status" aria-live="polite">等待确认</dd></div>
+            <div><dt>考费归属</dt><dd>全部归考官</dd></div>
+          </dl>
+          <div id="paymentNotice" class="notice warn" role="status" aria-live="polite" aria-atomic="true">请扫码付款，完成后刷新付款状态。</div>
+          <div class="payment-actions">
+            <button class="primary-action" id="refreshPaymentButton" type="button">刷新付款状态</button>
+            <button class="text-action" id="backToFormButton" type="button">返回修改信息</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="exam-notice">
+      <div class="section-heading"><span>考试说明</span><small>请在报名前确认</small></div>
+      <ol>
+        <li>每份试卷按题型随机抽取，满分 100 分。</li>
+        <li>客观题自动评分，简答与情景题按答题要点给出辅助分，管理员可复核。</li>
+        <li id="feePolicy">每位考生按个人考核次数付费：首次免费，第二次 20 元，第三次起每次 30 元。考费全部归考官。</li>
+        <li>达到通过线后生成唯一证明编号，可在线核验。</li>
+      </ol>
+      <div id="blueprint" hidden></div>
+    </section>
+  </main>
+
+  <script type="module" src="/app.js?v=20260922-1"></script>
+</body>
+</html>
