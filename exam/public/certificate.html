@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f7f2">
+  <meta name="theme-color" content="#fff8f6">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=20261012-2">
   <title>通过证明查询</title>
-  <link rel="stylesheet" href="/app.css?v=20260825-4">
+  <link rel="stylesheet" href="/app.css?v=20261012-sakura-1">
 </head>
 <body class="written-exam-page certificate-page">
   <header class="exam-site-header">
-    <div><b>证明核验</b><span>入职资格考试</span></div>
+    <div class="exam-brand"><img class="club-logo" src="/club-logo.png?v=20261012-2" alt="" width="384" height="384"><div><b>证明核验</b><span>机枪纯女电竞 · 入职考核</span></div></div>
     <a href="/">去考试</a>
   </header>
   <main class="certificate-shell">
@@ -18,7 +18,7 @@
       <p class="exam-section-no">CERTIFICATE VERIFICATION</p>
       <h1>通过证明查询</h1>
       <p>输入完整证明编号，核验考试结果是否真实有效。</p>
-      <form id="verifyForm"><input id="certificateId" autocomplete="off" placeholder="例如 JQ-2026-123456" required><button type="submit">立即核验</button></form>
+      <form id="verifyForm"><label for="certificateId" class="sr-only">证明编号</label><input id="certificateId" autocomplete="off" placeholder="例如 JQ-2026-123456" required><button type="submit">立即核验</button></form>
     </section>
     <div id="certificateResult"></div>
   </main>

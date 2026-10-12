@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f7f2">
+  <meta name="theme-color" content="#fff8f6">
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=20261012-2">
   <title>机枪纯女电竞 · 俱乐部入职文考</title>
-  <link rel="stylesheet" href="/app.css?v=20260922-1">
+  <link rel="stylesheet" href="/app.css?v=20261012-sakura-1">
 </head>
 <body class="written-exam-page">
   <header class="exam-site-header branded-site-header">
@@ -16,9 +16,15 @@
 
   <main class="exam-home" id="app">
     <section class="exam-intro">
-      <p class="exam-section-no">ENTRY EXAMINATION / 01</p>
-      <h1 id="examTitle">俱乐部入职文考</h1>
-      <p>请在安静、网络稳定的环境中独立完成。系统将随机组卷，提交后不能修改。</p>
+      <div class="intro-main">
+        <div class="intro-copy">
+          <p class="exam-section-no"><span aria-hidden="true">✦</span> 机枪纯女电竞 · 入职考核</p>
+          <h1 id="examTitle">俱乐部入职文考</h1>
+          <p>加入之前，先来一场认真作答。<br>请在安静、网络稳定的环境中独立完成考试。</p>
+          <span class="intro-badge">首次考试免费</span><span class="intro-hint">随机组卷 · 在线核验</span>
+        </div>
+        <div class="intro-art" aria-hidden="true"><span class="art-spark spark-one">✧</span><img src="/club-logo.png?v=20261012-2" alt="" width="384" height="384"><span class="art-spark spark-two">✦</span></div>
+      </div>
       <dl>
         <div><dt>题量</dt><dd id="questionCount">30 题</dd></div>
         <div><dt>时长</dt><dd id="examMinutes">18 分钟</dd></div>
@@ -37,7 +43,8 @@
     </section>
 
     <section id="setupView" class="registration-section">
-      <div class="section-heading"><span>报名信息</span><small>信息将用于考试记录和通过证明</small></div>
+      <div class="section-heading"><div><span class="section-kicker">REGISTRATION</span><h2>填写报名信息</h2></div><small>开始你的入职考核</small></div>
+      <p class="section-description">请核对姓名与东东 ID，信息将用于考试记录和通过证明。</p>
       <form id="candidateForm">
         <label><span>姓名 / 入职昵称</span><input id="candidateName" name="candidateName" required maxlength="30" autocomplete="name" placeholder="请填写真实信息"></label>
         <label><span>东东数字ID</span><input id="candidateId" name="candidateId" required maxlength="50" placeholder="请输入东东数字ID"></label>
@@ -85,7 +92,7 @@
     </section>
 
     <section class="exam-notice">
-      <div class="section-heading"><span>考试说明</span><small>请在报名前确认</small></div>
+      <div class="section-heading"><div><span class="section-kicker">BEFORE YOU START</span><h2>考试须知</h2></div><small>报名前请确认</small></div>
       <ol>
         <li id="questionPolicy">共 30 题：判断题 8 道、单选题 20 道、多选题 2 道；满分 100 分。</li>
         <li id="scoringPolicy">判断题和单选题每题 3 分，多选题每题 8 分。多选全对才得分，多选、少选、错选均不得分。</li>
@@ -96,7 +103,8 @@
       <div id="blueprint" hidden></div>
     </section>
   </main>
+  <footer class="exam-site-footer"><b>机枪纯女电竞</b><span>入职资格考试 · 通过证明可在线核验</span></footer>
 
-  <script type="module" src="/app.js?v=20261012-pay-1"></script>
+  <script type="module" src="/app.js?v=20261012-sakura-1"></script>
 </body>
 </html>

@@ -21,11 +21,14 @@ test("standalone pages keep the final H5 written-exam layout", () => {
   assert.match(certificate, /class="certificate-shell"/);
 });
 
-test("final H5 editorial palette is bundled locally", () => {
+test("club palette is bundled locally for the written-exam pages", () => {
   const css = readPublic("app.css");
+  const theme = readPublic("theme.css");
 
   assert.match(css, /\.written-exam-page\s*\{/);
-  assert.match(css, /background:\s*#f1f0eb/);
+  assert.match(css, /@import url\('\/theme\.css/);
+  assert.match(theme, /--primary:\s*#b83e68/);
+  assert.match(theme, /--page:\s*#fff8f6/);
   assert.match(css, /\.exam-intro\s*\{/);
   assert.match(css, /\.certificate-document\s*\{/);
 });

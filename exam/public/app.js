@@ -83,7 +83,7 @@ async function showPayment(payment) {
   $('#paymentId').textContent = payment.id.slice(-12);
   clearPaymentQr();
   updatePaymentStatus(payment);
-  window.scrollTo({ top: $('#paymentView').offsetTop - 20, behavior: 'smooth' });
+  $('#paymentView').scrollIntoView({ block: 'start' });
   if (payment.status === 'pending') await preparePaymentQr();
 }
 

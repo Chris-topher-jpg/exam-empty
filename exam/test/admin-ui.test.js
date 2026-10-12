@@ -42,7 +42,8 @@ test("admin workspace includes account management and restrained styling", () =>
   assert.match(css, /\.trend-chart\s*\{/);
   assert.match(css, /\.donut\s*\{/);
   assert.match(css, /\.admin-sidebar\s*\{/);
-  assert.match(css, /background:\s*#f4f5f7/);
+  assert.match(css, /@import url\('\/theme\.css/);
+  assert.match(css, /background:\s*var\(--page\)/);
   assert.doesNotMatch(css, /linear-gradient|radial-gradient/);
 });
 

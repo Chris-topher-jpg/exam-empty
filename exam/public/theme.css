@@ -1,0 +1,37 @@
+/* Colors inspired by the club logo: sakura pink, cream and warm brown. */
+:root {
+  --page: #fff8f6;
+  --surface: #ffffff;
+  --surface-soft: #fff0f3;
+  --cream: #fffaf0;
+  --ink: #49332d;
+  --muted: #806b65;
+  --line: #efdcd8;
+  --primary: #b83e68;
+  --primary-hover: #9e2f56;
+  --primary-soft: #fce5ed;
+  --success: #32634d;
+  --success-soft: #edf5ee;
+  --danger: #a5323f;
+  --danger-soft: #fff0ef;
+  --warning: #815b22;
+  --warning-soft: #fff6df;
+  --shadow: 0 8px 30px rgba(104, 57, 58, .045);
+  color-scheme: light;
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+html { min-width: 280px; background: var(--page); scroll-behavior: smooth; }
+body { margin: 0; color: var(--ink); background: var(--page); }
+button, input, textarea, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.hidden, [hidden] { display: none !important; }
+:where(button, a, input, textarea, select):focus-visible { outline: 3px solid var(--primary); outline-offset: 4px; }
+input::placeholder, textarea::placeholder { color: #95817b; opacity: 1; }
+button:disabled { cursor: default; opacity: .55; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

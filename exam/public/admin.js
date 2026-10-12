@@ -59,15 +59,15 @@ function renderTrendChart(days) {
 function renderPaymentMix(channels) {
   const total = channels.reduce((sum, item) => sum + item.revenue, 0);
   let cursor = 0;
-  const colors = ['#345347', '#8aa098', '#c0a15b'];
+  const colors = ['#b83e68', '#dcb4c0', '#b89a72'];
   const stops = channels.map((item, index) => { const start = cursor; cursor += total ? item.revenue / total * 100 : 0; return `${colors[index]} ${start}% ${cursor}%`; }).join(', ');
-  return `<div class="mix-visual"><div class="donut" style="background:${total ? `conic-gradient(${stops})` : '#e7e9ea'}"><div><strong>${money(total)}</strong><span>累计收款</span></div></div><div class="mix-legend">${channels.map((item, index) => `<div><i style="background:${colors[index]}"></i><span>${item.label}</span><strong>${money(item.revenue)}</strong><small>${item.count} 笔</small></div>`).join('')}</div></div>`;
+  return `<div class="mix-visual"><div class="donut" style="background:${total ? `conic-gradient(${stops})` : '#f4e6e6'}"><div><strong>${money(total)}</strong><span>累计收款</span></div></div><div class="mix-legend">${channels.map((item, index) => `<div><i style="background:${colors[index]}"></i><span>${item.label}</span><strong>${money(item.revenue)}</strong><small>${item.count} 笔</small></div>`).join('')}</div></div>`;
 }
 
 function renderResultMix(breakdown) {
   const total = (breakdown?.passed || 0) + (breakdown?.failed || 0);
   const rate = total ? breakdown.passed / total * 100 : 0;
-  return `<div class="mix-visual"><div class="donut result-donut" style="background:conic-gradient(#345347 0 ${rate}%, #d8b1ad ${rate}% 100%)"><div><strong>${rate.toFixed(1)}%</strong><span>通过率</span></div></div><div class="mix-legend"><div><i style="background:#345347"></i><span>通过</span><strong>${breakdown?.passed || 0}</strong><small>份</small></div><div><i style="background:#d8b1ad"></i><span>未通过</span><strong>${breakdown?.failed || 0}</strong><small>份</small></div></div></div>`;
+  return `<div class="mix-visual"><div class="donut result-donut" style="background:conic-gradient(#b83e68 0 ${rate}%, #eacbd4 ${rate}% 100%)"><div><strong>${rate.toFixed(1)}%</strong><span>通过率</span></div></div><div class="mix-legend"><div><i style="background:#b83e68"></i><span>通过</span><strong>${breakdown?.passed || 0}</strong><small>份</small></div><div><i style="background:#eacbd4"></i><span>未通过</span><strong>${breakdown?.failed || 0}</strong><small>份</small></div></div></div>`;
 }
 
 function renderOverview() {
