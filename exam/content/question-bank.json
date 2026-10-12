@@ -1,0 +1,797 @@
+{
+  "sourceDocument": "机枪纯女文考.xlsx",
+  "examConfig": {
+    "clubName": "机枪纯女电竞",
+    "examTitle": "俱乐部入职文考",
+    "examMinutes": 18,
+    "passScore": 85,
+    "maxAttempts": 6,
+    "scorePolicy": "highest",
+    "totalScore": 100,
+    "multipleChoiceScoring": "all-or-nothing",
+    "blueprint": {
+      "single": 20,
+      "multiple": 2,
+      "fill": 0,
+      "judge": 8,
+      "short": 0,
+      "scenario": 0
+    }
+  },
+  "questions": [
+    {
+      "id": "jqcn-01",
+      "type": "judge",
+      "prompt": "进店接单前，需确保东东电竞APP已申请并审核通过进入机枪纯女电竞，并将APP内技能打开，否则无法接单。",
+      "points": 3,
+      "answer": "true",
+      "explanation": "进店前先确认APP申请审核通过并进入本店，且必须打开APP内技能（不打开接不了单）。",
+      "category": "进店流程图·一、二",
+      "source": "进店流程图·一、二",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-02",
+      "type": "judge",
+      "prompt": "试音话术可自由发挥，但打招呼和说出自己的名字是必须有的。",
+      "points": 3,
+      "answer": "true",
+      "explanation": "试音文案可以自由发挥，但打招呼和说自己的名字必须要说。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-03",
+      "type": "judge",
+      "prompt": "试音时，为了帮老板更快选中自己，可以说“选我清图了”“选我杀完了”等话术突出优势。",
+      "points": 3,
+      "answer": "false",
+      "explanation": "禁止一切恶意竞争发言（如“选我清图了”“选我杀完了”），以免给老板造成误会，违者罚款。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-04",
+      "type": "judge",
+      "prompt": "跳单时，双培单可以在大厅扣1组队，再补充扣2+队友名字。",
+      "points": 3,
+      "answer": "false",
+      "explanation": "双培单严禁大厅扣1（扣了罚款），一定要扣2+队友名字，可去闲聊群组队。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-05",
+      "type": "judge",
+      "prompt": "派单过程中，陪玩可以在店里大厅和队友聊天活跃气氛。",
+      "points": 3,
+      "answer": "false",
+      "explanation": "派单中禁止聊天。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-06",
+      "type": "judge",
+      "prompt": "老板在大厅派单时，陪玩可私信老板推荐自己，提高被选中几率。",
+      "points": 3,
+      "answer": "false",
+      "explanation": "禁止老板派单时私信老板选你，违者罚款。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-07",
+      "type": "judge",
+      "prompt": "娱乐陪玩订单只包过点卡，无技术售后。",
+      "points": 3,
+      "answer": "true",
+      "explanation": "娱乐陪只需要包过点卡，无技术售后。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-08",
+      "type": "judge",
+      "prompt": "老板中途暂停游戏且未告知重启时间，陪玩原地等待10分钟后，超时可正常离场。",
+      "points": 3,
+      "answer": "true",
+      "explanation": "老板中途暂停且未告知重启时间，陪玩原地等待10分钟，超时可正常离场；等待过久需主动联系老板预约。",
+      "category": "店规·四订单暂停处理",
+      "source": "店规·四订单暂停处理",
+      "enabled": true
+    },
+    {
+      "id": "jqcn-09",
+      "type": "single",
+      "prompt": "确定可以接单之后，在公屏应该如何开始试音？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "确定可以接单后在公屏扣1，跟随客服引导按顺序试音。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "直接私聊客服"
+        },
+        {
+          "key": "B",
+          "text": "公屏扣1，跟随客服引导按顺序试音"
+        },
+        {
+          "key": "C",
+          "text": "直接上麦等待老板选择"
+        },
+        {
+          "key": "D",
+          "text": "私下联系老板"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-10",
+      "type": "single",
+      "prompt": "最后一个试音的陪玩需要说什么？",
+      "points": 3,
+      "answer": [
+        "A"
+      ],
+      "explanation": "最后一个试音的陪玩要说“麦甩给客服”。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "麦甩给客服"
+        },
+        {
+          "key": "B",
+          "text": "麦甩给下一个"
+        },
+        {
+          "key": "C",
+          "text": "我先撤了"
+        },
+        {
+          "key": "D",
+          "text": "请大家上麦"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-11",
+      "type": "single",
+      "prompt": "陪玩点击APP的哪个位置即可上麦？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "点击APP左下角的麦克风即可上麦。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "右下角头像"
+        },
+        {
+          "key": "B",
+          "text": "左下角的麦克风"
+        },
+        {
+          "key": "C",
+          "text": "左上角昵称"
+        },
+        {
+          "key": "D",
+          "text": "右上角设置"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-12",
+      "type": "single",
+      "prompt": "陪玩要播放BGM时，正确的操作是？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "点击设置开启（本地混响）再打开音乐软件即可播放；开启后它会播放电脑上所有声音，需确保没有其他声音。",
+      "category": "进店流程图·试音流程",
+      "source": "进店流程图·试音流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "直接打开音乐软件播放"
+        },
+        {
+          "key": "B",
+          "text": "点击设置开启（本地混响）后再打开音乐软件"
+        },
+        {
+          "key": "C",
+          "text": "开启AI降噪后播放"
+        },
+        {
+          "key": "D",
+          "text": "开启强降噪后播放"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-13",
+      "type": "single",
+      "prompt": "技术单赔付标准中，魔王小时需要达到几杀？",
+      "points": 3,
+      "answer": [
+        "D"
+      ],
+      "explanation": "机密技术小时4杀（绝密无赔付）、TOP小时5杀、PRO小时6杀、魔王小时7杀。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "4杀"
+        },
+        {
+          "key": "B",
+          "text": "5杀"
+        },
+        {
+          "key": "C",
+          "text": "6杀"
+        },
+        {
+          "key": "D",
+          "text": "7杀"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-14",
+      "type": "single",
+      "prompt": "技术单中，若本小时成功撤离一把，可减少几个人头数（每小时限一次）？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "若本小时成功撤离一把可-2人头数，每小时限一次。",
+      "category": "进店流程图·跳单流程",
+      "source": "进店流程图·跳单流程",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "1个"
+        },
+        {
+          "key": "B",
+          "text": "2个"
+        },
+        {
+          "key": "C",
+          "text": "3个"
+        },
+        {
+          "key": "D",
+          "text": "4个"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-15",
+      "type": "single",
+      "prompt": "陪玩与陪玩之间不可有任何小团体行为，若在店内群公然引起冲突，一经发现如何处理？",
+      "points": 3,
+      "answer": [
+        "C"
+      ],
+      "explanation": "陪玩间不可有小团体行为，也不可在店内群公然冲突，一经发现立即双清开除（欢迎举报）。",
+      "category": "进店流程图·接单注意事项",
+      "source": "进店流程图·接单注意事项",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "口头警告"
+        },
+        {
+          "key": "B",
+          "text": "罚款50元"
+        },
+        {
+          "key": "C",
+          "text": "立即双清开除"
+        },
+        {
+          "key": "D",
+          "text": "降级处理"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-16",
+      "type": "single",
+      "prompt": "遇到炸单转单的情况，正确做法是？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "如遇炸单转单，及时联系值班客服拉群，群内转让订单及炸单补贴，切忌私下转账。",
+      "category": "进店流程图·接单注意事项",
+      "source": "进店流程图·接单注意事项",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "私下与队友转账补贴"
+        },
+        {
+          "key": "B",
+          "text": "及时联系值班客服拉群，群内转让订单及炸单补贴，切忌私下转账"
+        },
+        {
+          "key": "C",
+          "text": "自行补钱给老板"
+        },
+        {
+          "key": "D",
+          "text": "让老板直接联系新陪玩"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-17",
+      "type": "single",
+      "prompt": "进入派单房间后默认进入待选状态，需在几分钟内按客服指引完成自我介绍/上麦试音？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "进入派单房间默认进入待选状态，3分钟内需按客服指引完成自我介绍/上麦试音（客服无指令除外），超时按走错房间处理。",
+      "category": "店规·二派单房间规则",
+      "source": "店规·二派单房间规则",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "1分钟"
+        },
+        {
+          "key": "B",
+          "text": "3分钟"
+        },
+        {
+          "key": "C",
+          "text": "5分钟"
+        },
+        {
+          "key": "D",
+          "text": "10分钟"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-18",
+      "type": "single",
+      "prompt": "不清楚老板性别时，以下哪个称呼可以使用？",
+      "points": 3,
+      "answer": [
+        "C"
+      ],
+      "explanation": "不清楚老板性别时，统一使用老板、板板、小宝、老师等称呼，避免冒犯。",
+      "category": "店规·二试音与称呼规范",
+      "source": "店规·二试音与称呼规范",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "兄弟"
+        },
+        {
+          "key": "B",
+          "text": "姐妹"
+        },
+        {
+          "key": "C",
+          "text": "老板、板板、小宝、老师"
+        },
+        {
+          "key": "D",
+          "text": "美女、帅哥"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-19",
+      "type": "single",
+      "prompt": "接单后最晚几小时内回复老板？所有订单最慢几天内完成？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "接单后最晚6小时内回复老板；所有订单最慢5天内完成。",
+      "category": "店规·四订单基础时效",
+      "source": "店规·四订单基础时效",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "3小时/3天"
+        },
+        {
+          "key": "B",
+          "text": "6小时/5天"
+        },
+        {
+          "key": "C",
+          "text": "6小时/6天"
+        },
+        {
+          "key": "D",
+          "text": "12小时/5天"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-20",
+      "type": "single",
+      "prompt": "通过群聊预约的订单，服务完成后几小时内需主动礼貌道别并退群？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "通过群聊预约的订单，服务完成后6小时内主动礼貌道别并退群。",
+      "category": "店规·四群聊与收尾规范",
+      "source": "店规·四群聊与收尾规范",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "3小时"
+        },
+        {
+          "key": "B",
+          "text": "6小时"
+        },
+        {
+          "key": "C",
+          "text": "12小时"
+        },
+        {
+          "key": "D",
+          "text": "24小时"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-21",
+      "type": "single",
+      "prompt": "时长单即将到期前提前几分钟提醒老板？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "时长单即将到期前提前10分钟提醒老板，仅告知时间，严禁主动引导续费，续单与否由老板自行决定。",
+      "category": "店规·四时长单专项要求",
+      "source": "店规·四时长单专项要求",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "5分钟"
+        },
+        {
+          "key": "B",
+          "text": "10分钟"
+        },
+        {
+          "key": "C",
+          "text": "15分钟"
+        },
+        {
+          "key": "D",
+          "text": "20分钟"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-22",
+      "type": "single",
+      "prompt": "预判存在客诉风险时，每小时至少主动说几次“不好意思”？",
+      "points": 3,
+      "answer": [
+        "C"
+      ],
+      "explanation": "预判存在客诉风险时，每小时至少主动说5次“不好意思”；对局顺利、确认老板体验良好可免做。",
+      "category": "店规·五客诉风险应对",
+      "source": "店规·五客诉风险应对",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "2次"
+        },
+        {
+          "key": "B",
+          "text": "3次"
+        },
+        {
+          "key": "C",
+          "text": "5次"
+        },
+        {
+          "key": "D",
+          "text": "10次"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-23",
+      "type": "single",
+      "prompt": "三角洲陪玩、护航对局中，自身游戏收益与老板的关系是？",
+      "points": 3,
+      "answer": [
+        "B"
+      ],
+      "explanation": "三角洲陪玩、护航对局中，自身游戏收益不得超过老板。",
+      "category": "店规·六三角洲收益规则",
+      "source": "店规·六三角洲收益规则",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "可以超过老板"
+        },
+        {
+          "key": "B",
+          "text": "不得超过老板"
+        },
+        {
+          "key": "C",
+          "text": "必须和老板完全一样"
+        },
+        {
+          "key": "D",
+          "text": "没有要求"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-24",
+      "type": "single",
+      "prompt": "三角洲对卡进图中，娱乐单最低几套进图？其他单最低几套/几头几甲进图？",
+      "points": 3,
+      "answer": [
+        "A"
+      ],
+      "explanation": "娱乐最低四套进图，其他最低五套/四头五甲进图。",
+      "category": "店规·六物资、对卡等订单标准",
+      "source": "店规·六物资、对卡等订单标准",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "四套；五套/四头五甲"
+        },
+        {
+          "key": "B",
+          "text": "五套；四套/四头五甲"
+        },
+        {
+          "key": "C",
+          "text": "三套；五套/四头五甲"
+        },
+        {
+          "key": "D",
+          "text": "四套；四套/三头三甲"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-25",
+      "type": "single",
+      "prompt": "三角洲炸单判定中，以下哪种情况视为不计入保底？",
+      "points": 3,
+      "answer": [
+        "C"
+      ],
+      "explanation": "打手双倒（张姐自救不算）、老板兜底并且成功撤离视为不计入保底。",
+      "category": "店规·六炸单判定与处理",
+      "source": "店规·六炸单判定与处理",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "打手双倒"
+        },
+        {
+          "key": "B",
+          "text": "张姐自救"
+        },
+        {
+          "key": "C",
+          "text": "老板兜底并且成功撤离"
+        },
+        {
+          "key": "D",
+          "text": "打手单倒"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-26",
+      "type": "single",
+      "prompt": "订单开局连续炸几把、中途连续炸几把，会强制更换陪玩？",
+      "points": 3,
+      "answer": [
+        "A"
+      ],
+      "explanation": "订单开局连续炸4把、订单中途连续炸6把，强制更换陪玩。",
+      "category": "店规·六炸单判定与处理",
+      "source": "店规·六炸单判定与处理",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "开局4把/中途6把"
+        },
+        {
+          "key": "B",
+          "text": "开局6把/中途4把"
+        },
+        {
+          "key": "C",
+          "text": "开局3把/中途5把"
+        },
+        {
+          "key": "D",
+          "text": "开局5把/中途7把"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-27",
+      "type": "single",
+      "prompt": "所有订单必须全程录屏（音画完整）至少保存到结单后多久？",
+      "points": 3,
+      "answer": [
+        "C"
+      ],
+      "explanation": "所有订单必须全程录屏（音画完整）至少保存到结单72小时以后；无声音、画面残缺均视为无效录屏，因无有效录屏产生客诉、售后由陪玩承担全部责任。",
+      "category": "店规·八录屏硬性要求",
+      "source": "店规·八录屏硬性要求",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "24小时"
+        },
+        {
+          "key": "B",
+          "text": "48小时"
+        },
+        {
+          "key": "C",
+          "text": "72小时"
+        },
+        {
+          "key": "D",
+          "text": "7天"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-28",
+      "type": "single",
+      "prompt": "客服班次中，早班的时间段是？",
+      "points": 3,
+      "answer": [
+        "A"
+      ],
+      "explanation": "客服分三个固定班次：早班8:00-16:00、中班16:00-24:00、夜班24:00-8:00。",
+      "category": "店规·九客服班次",
+      "source": "店规·九客服班次",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "8:00-16:00"
+        },
+        {
+          "key": "B",
+          "text": "16:00-24:00"
+        },
+        {
+          "key": "C",
+          "text": "24:00-8:00"
+        },
+        {
+          "key": "D",
+          "text": "6:00-14:00"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-29",
+      "type": "multiple",
+      "prompt": "以下哪些属于进队沟通中“售后判定标准”的必做检查项？（多选）",
+      "points": 8,
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "售后判定标准包括：是否有名字和自我介绍、是否游戏开始前祝福、是否说必说部分、双陪是否问物资/猛攻、是否对卡、是否问大红包、结束后是否确认已结单并问体验、是否有离队祝福；“索要好评”不在其中。",
+      "category": "进队SOP·售后判定标准",
+      "source": "进队SOP·售后判定标准",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "是否有名字、是否说了自己的自我介绍"
+        },
+        {
+          "key": "B",
+          "text": "有没有在游戏开始前祝福"
+        },
+        {
+          "key": "C",
+          "text": "双陪订单有没有问老板是物资还是猛攻"
+        },
+        {
+          "key": "D",
+          "text": "有没有向老板索要好评"
+        }
+      ]
+    },
+    {
+      "id": "jqcn-30",
+      "type": "multiple",
+      "prompt": "以下哪些行为属于“混单”范畴，会被严肃处罚？（多选）",
+      "points": 8,
+      "answer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "explanation": "话少、双陪自顾聊天、休闲游戏挂机/摸鱼、消极游戏等影响服务体验的行为定义为混单，严肃处罚；D为正确做法。",
+      "category": "店规·五混单界定与处罚",
+      "source": "店规·五混单界定与处罚",
+      "enabled": true,
+      "options": [
+        {
+          "key": "A",
+          "text": "话少、冷落老板"
+        },
+        {
+          "key": "B",
+          "text": "双陪自顾聊天"
+        },
+        {
+          "key": "C",
+          "text": "休闲游戏挂机/摸鱼"
+        },
+        {
+          "key": "D",
+          "text": "对局中积极给老板提供战术建议"
+        }
+      ]
+    }
+  ]
+}

@@ -1,40 +1,19 @@
-比比鸟电竞俱乐部入职文考 - 快速说明
+机枪纯女电竞入职文考 - 快速说明
 
-一、启动
-macOS / Linux:
-  ADMIN_PASSWORD='你的管理员密码' node server.js
+在 exam 目录运行 node server.js（Node.js 20+，无需 npm install）。
+首次启动会自动初始化随项目保存的 Excel 题库。
 
-Windows PowerShell:
-  $env:ADMIN_PASSWORD = '你的管理员密码'
-  node server.js
+考生端：http://localhost:3000/
+管理后台：http://localhost:3000/admin
+证明查询：http://localhost:3000/certificate
+首次账号：admin / admin123
 
-二、访问地址
-考生端：    http://localhost:3000/
-管理员后台：http://localhost:3000/admin
-证明查询：  http://localhost:3000/certificate
+考试：30 题，100 分，18 分钟，85 分及以上通过。
+判断 8×3 分、单选 20×3 分、多选 2×8 分。
+多选全对才得分，多选、少选、错选均不得分。
+每人 6 次机会，取最高分。
+首次免费、第二次 20 元、第三至六次每次 30 元，考费全部归考官。
 
-三、账号密码
-首次启动的所有者用户名：admin
-默认密码：admin123
-正式环境请使用 ADMIN_PASSWORD 设置初始密码。
-登录后可在“管理员账号”中创建多个独立管理员。
-
-四、测试模式
-DEMO_AUTO_PAY=1 ADMIN_PASSWORD='admin123' node server.js
-
-演示模式不需要真实收款码，考生提交付款申请后会自动确认。
-
-五、正式收款
-1. 后台上传真实商户收款二维码。
-2. 考生扫码付款。
-3. 管理员核对到账。
-4. 后台点击“确认收款”。
-5. 考生刷新付款状态后进入考试。
-
-六、考试规则
-30 道题：单选 15、判断 6、简答 6、情景 3。
-85 分通过，最多 6 次；首次免费，第二次 20 元，第三次起每次 30 元。
-每位考生按个人考核次数付费，考费全部归考官；首次报名直接进入考试。
-
-七、安全
-正式环境必须修改默认密码、关闭 DEMO_AUTO_PAY、使用 HTTPS，并备份 data/。
+正式部署应设置强管理员密码、使用 HTTPS、关闭演示自动付款，并备份 data/。
+题库源文件：content/机枪纯女文考.xlsx
+重新导入：python scripts/import-excel-bank.py content/机枪纯女文考.xlsx content/question-bank.json

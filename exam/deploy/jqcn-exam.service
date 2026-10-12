@@ -1,14 +1,14 @@
 [Unit]
-Description=Bibiniao entry exam
+Description=JQCN entry exam
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-User=bibiniao-exam
-Group=bibiniao-exam
-WorkingDirectory=/opt/bibiniao-exam/current
-EnvironmentFile=/etc/bibiniao-exam.env
+User=jqcn-exam
+Group=jqcn-exam
+WorkingDirectory=/opt/jqcn-exam/current
+EnvironmentFile=/etc/jqcn-exam.env
 ExecStart=/usr/bin/node server.js
 Restart=on-failure
 RestartSec=3
@@ -18,7 +18,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/var/lib/bibiniao-exam
+ReadWritePaths=/var/lib/jqcn-exam
 
 [Install]
 WantedBy=multi-user.target

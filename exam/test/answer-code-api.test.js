@@ -10,7 +10,7 @@ let directory;
 let adminToken;
 
 function fixtureQuestions() {
-  const blueprint = { single: 15, multiple: 0, fill: 0, judge: 6, short: 6, scenario: 3 };
+  const blueprint = { single: 20, multiple: 2, fill: 0, judge: 8, short: 0, scenario: 0 };
   return Object.entries(blueprint).flatMap(([type, count]) => Array.from({ length: count * 2 }, (_, index) => ({
     id: `${type}-${index + 1}`,
     type,
@@ -78,7 +78,7 @@ test("admin-generated answer code bypasses payment and can optionally count as r
   assert.equal(exam.response.status, 201);
   assert.ok(exam.data.id);
   const remainingMinutes = (new Date(exam.data.expiresAt).getTime() - Date.now()) / 60_000;
-  assert.ok(remainingMinutes > 9.8 && remainingMinutes <= 10);
+  assert.ok(remainingMinutes > 17.8 && remainingMinutes <= 18);
 
   const codes = await request("/api/admin/answer-codes", { token: adminToken });
   assert.equal(codes.data.answerCodes[0].usedCount, 1);

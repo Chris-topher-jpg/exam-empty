@@ -10,7 +10,7 @@ const count = Number(process.argv[2] || 20);
 assert.ok(Number.isInteger(count) && count >= 1 && count <= 100);
 const questionBank = path.resolve(process.env.ONBOARDING_EXAM_QUESTION_BANK_PATH || 'data/question-bank.json');
 assert.ok(fs.existsSync(questionBank), 'Question bank required');
-const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'bibiniao-smoke-'));
+const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'jqcn-smoke-'));
 Object.assign(process.env, {
   ONBOARDING_EXAM_STATE_PATH: path.join(directory, 'state.json'),
   ONBOARDING_EXAM_CONFIG_PATH: path.join(directory, 'config.json'),

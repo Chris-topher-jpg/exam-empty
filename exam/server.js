@@ -21,6 +21,7 @@ import { ensureBlueprintCapacity, normalizeBlueprint, normalizeQuestion, questio
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(ROOT, "public");
 const DATA_DIR = path.join(ROOT, "data");
+const BUNDLED_BANK_PATH = path.join(ROOT, "content", "question-bank.json");
 const STATE_PATH = process.env.ONBOARDING_EXAM_STATE_PATH || path.join(DATA_DIR, "state.json");
 const CONFIG_PATH = process.env.ONBOARDING_EXAM_CONFIG_PATH || path.join(DATA_DIR, "config.json");
 const QUESTION_BANK_PATH = process.env.ONBOARDING_EXAM_QUESTION_BANK_PATH || path.join(DATA_DIR, "question-bank.json");
@@ -32,13 +33,13 @@ const RELEASE_REVISION = process.env.RELEASE_REVISION || "development";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 const DEMO_AUTO_PAY = process.env.DEMO_AUTO_PAY === "1";
 const EXAM_PUBLIC_URL = process.env.ONBOARDING_EXAM_PUBLIC_URL || "";
-const DEFAULT_EXAM_MINUTES = 10;
+const DEFAULT_EXAM_MINUTES = 18;
 const MIN_EXAM_MINUTES = 1;
 const MAX_EXAM_MINUTES = 180;
 const EXAM_SUBMIT_GRACE_MS = 60_000;
 
 const defaultConfig = {
-  clubName: "比比鸟电竞",
+  clubName: "机枪纯女电竞",
   examTitle: "俱乐部入职文考",
   passScore: 85,
   maxAttempts: 6,
@@ -47,6 +48,7 @@ const defaultConfig = {
   contactText: "付款后请保留支付凭证。",
   qrFile: "",
   blueprint: EXAM_BLUEPRINT,
+  scorePolicy: "highest",
 };
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -65,7 +67,8 @@ function writeJson(filePath, value) {
   fs.renameSync(tempPath, filePath);
 }
 
-let config = { ...defaultConfig, ...readJson(CONFIG_PATH, {}) };
+const bundledBank = readJson(BUNDLED_BANK_PATH, null);
+let config = { ...defaultConfig, ...(bundledBank?.examConfig || {}), ...readJson(CONFIG_PATH, {}) };
 config.blueprint = { ...EXAM_BLUEPRINT, ...(config.blueprint || {}) };
 config.examMinutes = normalizeExamMinutes(config.examMinutes);
 let state = readJson(STATE_PATH, {
@@ -77,6 +80,10 @@ let state = readJson(STATE_PATH, {
 });
 state.answerCodes = Array.isArray(state.answerCodes) ? state.answerCodes : [];
 let questionBank = readJson(QUESTION_BANK_PATH, null);
+if (!questionBank && !process.env.ONBOARDING_EXAM_QUESTION_BANK_PATH && bundledBank) {
+  questionBank = structuredClone(bundledBank);
+  writeJson(QUESTION_BANK_PATH, questionBank);
+}
 if (!questionBank) throw new Error("缺少 data/question-bank.json，请先运行题库导入脚本。 ");
 validateQuestionBank(questionBank, config.blueprint);
 
@@ -414,6 +421,9 @@ function publicConfig() {
     feeSchedule: Array.from({ length: config.maxAttempts }, (_, index) => feeForAttempt(index + 1)),
     feePolicy: "每位考生按个人考核次数付费：首次免费，第二次 20 元，第三次起每次 30 元。考费全部归考官。",
     examMinutes: config.examMinutes,
+    totalScore: 100,
+    scorePolicy: config.scorePolicy,
+    multipleChoiceScoring: "多选全对才得分，多选、少选、错选均不得分。",
     paymentInstructions: config.paymentInstructions,
     contactText: config.contactText,
     demoAutoPay: DEMO_AUTO_PAY,
@@ -421,6 +431,8 @@ function publicConfig() {
       type,
       label: QUESTION_TYPE_LABELS[type],
       count,
+      points: [...new Set(questionBank.questions.filter((question) => question.type === type && question.enabled !== false).map((question) => question.points))].length === 1
+        ? questionBank.questions.find((question) => question.type === type && question.enabled !== false)?.points : null,
     })),
   };
 }
@@ -452,7 +464,20 @@ function createOrUpdateCertificate(result) {
   return certificate;
 }
 
-const resultResponse = (result, detailLevel = "none") => createResultResponse(result, detailLevel, config.passScore);
+function highestResult(key) {
+  return state.results.filter((result) => result.candidateKey === key)
+    .reduce((best, result) => !best || result.finalScore > best.finalScore ? result : best, null);
+}
+
+const resultResponse = (result, detailLevel = "none") => {
+  const highest = highestResult(result.candidateKey) || result;
+  return {
+    ...createResultResponse(result, detailLevel, config.passScore),
+    highestScore: highest.finalScore,
+    highestPassed: highest.finalScore >= config.passScore,
+    highestCertificateId: highest.certificateId || null,
+  };
+};
 
 function localDayKey(value) {
   const date = new Date(value);
@@ -526,7 +551,7 @@ function dashboardData(currentUser) {
 
 async function handleApi(request, response, url) {
   if (request.method === "GET" && url.pathname === "/api/health") {
-    return sendJson(response, 200, { ok: true, service: "bibiniao-exam", revision: RELEASE_REVISION });
+    return sendJson(response, 200, { ok: true, service: "jqcn-exam", revision: RELEASE_REVISION });
   }
   if (request.method === "GET" && url.pathname === "/api/config") {
     return sendJson(response, 200, publicConfig());
@@ -554,6 +579,7 @@ async function handleApi(request, response, url) {
       attemptsRemaining: Math.max(0, config.maxAttempts - used),
       nextAttempt: used + 1,
       nextFee: used < config.maxAttempts ? feeForAttempt(used + 1) : null,
+      highestScore: highestResult(key)?.finalScore ?? null,
       pendingPayment: pendingPayment ? paymentResponse(pendingPayment) : null,
     });
   }
@@ -569,7 +595,7 @@ async function handleApi(request, response, url) {
     if (!key) return sendError(response, 400, "请输入东东数字ID");
     if (!cleanText(body.code, 40)) return sendError(response, 400, "请输入答题码");
     const used = attemptsFor(key);
-    if (used >= config.maxAttempts) return sendError(response, 403, "六次考试机会已全部使用");
+    if (used >= config.maxAttempts) return sendError(response, 403, `${config.maxAttempts} 次考试机会已全部使用`);
 
     const existingPaid = state.payments
       .filter((payment) => payment.candidateKey === key && payment.status === "paid" && !payment.usedAt)
@@ -630,7 +656,7 @@ async function handleApi(request, response, url) {
     if (!key) return sendError(response, 400, "请输入东东数字ID");
 
     const used = attemptsFor(key);
-    if (used >= config.maxAttempts) return sendError(response, 403, "六次考试机会已全部使用");
+    if (used >= config.maxAttempts) return sendError(response, 403, `${config.maxAttempts} 次考试机会已全部使用`);
     const attemptNumber = used + 1;
     const amount = feeForAttempt(attemptNumber);
     const existing = state.payments
@@ -728,7 +754,7 @@ async function handleApi(request, response, url) {
     }
 
     const used = attemptsFor(payment.candidateKey);
-    if (used >= config.maxAttempts) return sendError(response, 403, "六次考试机会已全部使用");
+    if (used >= config.maxAttempts) return sendError(response, 403, `${config.maxAttempts} 次考试机会已全部使用`);
     const createdAt = nowIso();
     const previousQuestionIds = state.exams
       .filter((item) => item.candidateKey === payment.candidateKey)

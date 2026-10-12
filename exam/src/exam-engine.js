@@ -1,12 +1,12 @@
 import crypto from "node:crypto";
 
 export const EXAM_BLUEPRINT = Object.freeze({
-  single: 15,
-  multiple: 0,
+  single: 20,
+  multiple: 2,
   fill: 0,
-  judge: 6,
-  short: 6,
-  scenario: 3,
+  judge: 8,
+  short: 0,
+  scenario: 0,
 });
 
 export const QUESTION_TYPE_LABELS = Object.freeze({

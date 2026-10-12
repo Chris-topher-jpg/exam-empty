@@ -46,6 +46,10 @@ function renderConfig() {
   $('#maxAttempts').textContent = `${state.config.maxAttempts} 次`;
   $('#paymentInstructions').textContent = state.config.paymentInstructions;
   $('#feePolicy').textContent = state.config.feePolicy;
+  const types = state.config.blueprint.filter((item) => item.count > 0);
+  $('#questionPolicy').textContent = `共 ${types.reduce((sum, item) => sum + item.count, 0)} 题：${types.map((item) => `${item.label} ${item.count} 道`).join('、')}；满分 ${state.config.totalScore} 分。`;
+  $('#scoringPolicy').textContent = `${types.filter((item) => item.points).map((item) => `${item.label}每题 ${item.points} 分`).join('，')}。${state.config.multipleChoiceScoring}`;
+  $('#attemptPolicy').textContent = `考试时长 ${state.config.examMinutes} 分钟，${state.config.passScore} 分及以上通过。每人 ${state.config.maxAttempts} 次机会，取最高分。`;
   document.title = `${state.config.clubName} · ${state.config.examTitle}`;
   renderBlueprint();
 }
@@ -54,9 +58,10 @@ function renderStatus(status) {
   const element = $('#candidateStatus');
   if (!status) return element.classList.add('hidden');
   element.classList.remove('hidden');
-  if (!status.attemptsRemaining) return notice(element, `该东东数字ID已用完 ${state.config.maxAttempts} 次考试机会。`, 'error');
+  const highestText = status.highestScore === null ? '' : `历史最高分 ${status.highestScore} 分。`;
+  if (!status.attemptsRemaining) return notice(element, `该东东数字ID已用完 ${state.config.maxAttempts} 次考试机会。${highestText}`, 'error');
   const feeText = status.nextFee === 0 ? '免费' : `费用 ¥${status.nextFee}`;
-  notice(element, `已使用 ${status.attemptsUsed} 次，还剩 ${status.attemptsRemaining} 次；本次为第 ${status.nextAttempt} 次，${feeText}。`, 'info');
+  notice(element, `${highestText}已使用 ${status.attemptsUsed} 次，还剩 ${status.attemptsRemaining} 次；本次为第 ${status.nextAttempt} 次，${feeText}。`, 'info');
 }
 
 async function lookupStatus(candidateId) {

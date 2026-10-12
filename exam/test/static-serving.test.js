@@ -14,7 +14,7 @@ before(async () => {
   directory = fs.mkdtempSync(path.join(os.tmpdir(), "jqdj-static-server-"));
   adminUsersPath = path.join(directory, "admin-users.json");
   questionBankPath = path.join(directory, "question-bank.json");
-  const blueprint = { single: 15, multiple: 0, fill: 0, judge: 6, short: 6, scenario: 3 };
+  const blueprint = { single: 20, multiple: 2, fill: 0, judge: 8, short: 0, scenario: 0 };
   const questions = Object.entries(blueprint).flatMap(([type, count]) => Array.from({ length: count }, (_, index) => ({
     id: `${type}-${index + 1}`,
     type,

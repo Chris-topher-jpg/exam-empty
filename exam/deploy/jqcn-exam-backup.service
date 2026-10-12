@@ -1,0 +1,7 @@
+[Unit]
+Description=Back up JQCN exam business data
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/jqcn-exam/current/deploy/backup.sh
+UMask=0077

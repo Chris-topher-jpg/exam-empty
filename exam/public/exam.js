@@ -92,9 +92,9 @@ function updateProgress() {
 
 function renderExam() {
   const exam = examState.exam;
-  document.title = `第 ${exam.attemptNumber} 次 · 比比鸟电竞入职文考`;
+  document.title = `第 ${exam.attemptNumber} 次 · 机枪纯女电竞入职文考`;
   $('#candidateMeta').textContent = `${exam.candidateName} · 第 ${exam.attemptNumber} 次`;
-  $('#examApp').innerHTML = `${exam.questions.map(renderQuestion).join('')}<footer class="submit-section"><p>请确认所有答案。提交后系统立即评分，主观题仍可由管理员复核。</p><button id="submitExam" type="button">提交试卷</button></footer>`;
+  $('#examApp').innerHTML = `${exam.questions.map(renderQuestion).join('')}<footer class="submit-section"><p>请确认所有答案。多选全对才得分，多选、少选、错选均不得分。提交后系统立即评分，6 次考试取最高分。</p><button id="submitExam" type="button">提交试卷</button></footer>`;
   document.querySelectorAll('input, textarea').forEach((input) => input.addEventListener('change', () => { collectAnswers(); updateProgress(); }));
   document.querySelectorAll('textarea').forEach((input) => input.addEventListener('input', () => { collectAnswers(); updateProgress(); }));
   $('#submitExam').addEventListener('click', () => submitExam(false));
