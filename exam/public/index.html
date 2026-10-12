@@ -58,17 +58,13 @@
         <div class="qr-column" aria-label="考试收款码">
           <div class="payment-qr-grid">
             <figure class="payment-method">
-              <img id="paymentWechatQr" class="payment-qr" src="/payment-wechat.jpg" alt="微信收款码">
+              <img id="paymentWechatQr" class="payment-qr hidden" alt="本次考试微信支付二维码">
               <figcaption>微信支付</figcaption>
-              <a id="savePaymentQr" class="qr-save-button" href="/payment-wechat.jpg" download="机枪纯女电竞-微信收款码.jpg">保存微信收款码</a>
-            </figure>
-            <figure class="payment-method">
-              <img id="paymentAlipayQr" class="payment-qr" src="/payment-alipay.jpg" alt="支付宝收款码">
-              <figcaption>支付宝</figcaption>
-              <a id="saveAlipayQr" class="qr-save-button" href="/payment-alipay.jpg" download="机枪纯女电竞-支付宝收款码.jpg">保存支付宝收款码</a>
+              <p id="paymentQrMessage" role="status">正在准备付款二维码…</p>
+              <a id="savePaymentQr" class="qr-save-button hidden" download="机枪纯女电竞-微信付款码.gif">保存本次付款码</a>
             </figure>
           </div>
-          <span class="qr-caption">请按页面显示金额扫码付款，付款后点击下方按钮刷新状态</span>
+          <span class="qr-caption">二维码仅用于本次订单，付款后系统自动确认</span>
         </div>
         <div class="payment-details">
           <p id="paymentInstructions">请按页面显示金额扫码付款，付款后等待系统确认。</p>
@@ -101,6 +97,6 @@
     </section>
   </main>
 
-  <script type="module" src="/app.js?v=20260922-1"></script>
+  <script type="module" src="/app.js?v=20261012-pay-1"></script>
 </body>
 </html>

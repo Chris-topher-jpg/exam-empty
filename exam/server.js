@@ -16,6 +16,7 @@ import { gradeExamWithAi } from "./src/subjective-ai-grader.js";
 import { AnswerCodeError, answerCodeView, createAnswerCode, redeemAnswerCode } from "./src/answer-codes.js";
 import { AdminUserError, AdminUserStore, hasAdminPermission } from "./src/admin-users.js";
 import { expirePendingPayment, paymentExpiresAt } from "./src/payment-lifecycle.js";
+import { WechatPay, readWechatConfig, applyWechatTransaction } from "./src/wechat-pay.js";
 import { ensureBlueprintCapacity, normalizeBlueprint, normalizeQuestion, questionBankSummary } from "./src/question-bank.js";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -32,7 +33,10 @@ const HOST = process.env.HOST || "0.0.0.0";
 const RELEASE_REVISION = process.env.RELEASE_REVISION || "development";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
 const DEMO_AUTO_PAY = process.env.DEMO_AUTO_PAY === "1";
-const EXAM_PUBLIC_URL = process.env.ONBOARDING_EXAM_PUBLIC_URL || "";
+const wechatPay = new WechatPay(readWechatConfig());
+const prepayRequests = new Map();
+const queryRequests = new Map();
+const lastPaymentQuery = new Map();
 const DEFAULT_EXAM_MINUTES = 18;
 const MIN_EXAM_MINUTES = 1;
 const MAX_EXAM_MINUTES = 180;
@@ -169,6 +173,7 @@ function paymentResponse(payment) {
     confirmedAt: payment.confirmedAt || null,
     examId: payment.examId || null,
     paymentChannel: payment.paymentChannel || null,
+    nativeOrderCreated: Boolean(payment.nativePrepayRequestedAt),
     codeUrl: payment.codeUrl || null,
     wechatTransactionId: payment.wechatTransactionId || null,
     paidAt: payment.paidAt || null,
@@ -178,109 +183,66 @@ function paymentResponse(payment) {
   };
 }
 
-function examWechatEnv(name) {
-  return String(process.env[`ONBOARDING_EXAM_WECHAT_PAY_${name}`] || "").trim();
-}
-
-function examWechatPrivateKey() {
-  const base64 = examWechatEnv("PRIVATE_KEY_BASE64");
-  if (base64) return Buffer.from(base64, "base64").toString("utf8");
-  const raw = examWechatEnv("PRIVATE_KEY");
-  return raw ? raw.replace(/\\n/g, "\n") : "";
-}
-
-function examWechatPlatformPublicKey() {
-  const base64 = examWechatEnv("PLATFORM_PUBLIC_KEY_BASE64");
-  if (base64) return Buffer.from(base64, "base64").toString("utf8");
-  const raw = examWechatEnv("PLATFORM_PUBLIC_KEY");
-  return raw ? raw.replace(/\\n/g, "\n") : "";
-}
-
-function nativePayConfigured() {
-  return Boolean(
-    examWechatEnv("MCH_ID") &&
-      examWechatEnv("APP_ID") &&
-      examWechatEnv("API_V3_KEY").length === 32 &&
-      examWechatEnv("MCH_SERIAL_NO") &&
-      examWechatPrivateKey() &&
-      examWechatPlatformPublicKey() &&
-      EXAM_PUBLIC_URL,
-  );
-}
-
-function wechatAuthorization(method, pathWithQuery, body) {
-  const timestamp = Math.floor(Date.now() / 1000).toString();
-  const nonce = crypto.randomBytes(16).toString("hex");
-  const message = `${method}\n${pathWithQuery}\n${timestamp}\n${nonce}\n${body}\n`;
-  const signature = crypto.sign("RSA-SHA256", Buffer.from(message), examWechatPrivateKey()).toString("base64");
-  return `WECHATPAY2-SHA256-RSA2048 mchid="${examWechatEnv("MCH_ID")}",nonce_str="${nonce}",signature="${signature}",timestamp="${timestamp}",serial_no="${examWechatEnv("MCH_SERIAL_NO")}"`;
+async function reconcileWechatPayment(payment, { force = false } = {}) {
+  if (!wechatPay.status.ready || payment.paymentChannel !== "wechat_native" || !payment.nativePrepayRequestedAt || payment.status === "paid") return;
+  if (queryRequests.has(payment.id)) return queryRequests.get(payment.id);
+  if (!force && Date.now() - (lastPaymentQuery.get(payment.id) || 0) < 10_000) return;
+  const task = (async () => {
+    lastPaymentQuery.set(payment.id, Date.now());
+    try {
+      const transaction = await wechatPay.query(payment.paymentNo);
+      if (applyWechatTransaction(wechatPay, transaction, payment)) saveState();
+    } catch (error) {
+      if (error.code !== "ORDER_NOT_EXIST" && force) throw error;
+    }
+  })();
+  queryRequests.set(payment.id, task);
+  try { await task; } finally { queryRequests.delete(payment.id); }
 }
 
 async function createNativePrepay(payment) {
-  if (!nativePayConfigured()) throw new Error("Native 支付尚未配置完整，请先使用人工收款兜底");
-  const pathName = "/v3/pay/transactions/native";
-  const body = JSON.stringify({
-    appid: examWechatEnv("APP_ID"),
-    mchid: examWechatEnv("MCH_ID"),
-    description: `${config.clubName}${config.examTitle}第${payment.attemptNumber}次`,
-    out_trade_no: payment.paymentNo,
-    time_expire: new Date(paymentExpiresAt(payment)).toISOString(),
-    notify_url: `${EXAM_PUBLIC_URL.replace(/\/$/, "")}/api/payment/wechat-notify`,
-    amount: { total: Math.round(payment.amount * 100), currency: "CNY" },
-    attach: JSON.stringify({ business: "jqdj_exam" }),
-  });
-  const result = await fetch(`https://api.mch.weixin.qq.com${pathName}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json", Authorization: wechatAuthorization("POST", pathName, body) },
-    body,
-  });
-  const payload = await result.json().catch(() => ({}));
-  if (!result.ok || !payload.code_url) {
-    console.warn("[native-pay] prepay failed", { status: result.status, code: payload.code, message: payload.message });
-    throw new Error("Native 支付下单失败，请稍后重试或使用人工收款");
-  }
-  payment.paymentChannel = "wechat_native";
-  payment.codeUrl = payload.code_url;
-  saveState();
-  return paymentResponse(payment);
+  if (!wechatPay.status.ready) throw new Error("微信收款尚未开通，请联系考官或使用答题码");
+  if (prepayRequests.has(payment.id)) return prepayRequests.get(payment.id);
+  const task = (async () => {
+    if (payment.codeUrl) return paymentResponse(payment);
+    if (payment.nativePrepayRequestedAt) await reconcileWechatPayment(payment, { force: true });
+    if (payment.status === "paid") return paymentResponse(payment);
+    if (payment.status !== "pending" || paymentExpiresAt(payment) - Date.now() < 60_000) throw new Error("付款单已临近到期，请稍后重新报名");
+    payment.paymentChannel = "wechat_native";
+    payment.nativePrepayRequestedAt = nowIso();
+    saveState(); // Persist before networking so a timeout or restart can be recovered by querying.
+    const codeUrl = await wechatPay.prepay(payment, `${config.clubName}${config.examTitle}第${payment.attemptNumber}次`);
+    if (payment.status === "paid") return paymentResponse(payment);
+    if (payment.status !== "pending" || expirePendingPayment(payment)) {
+      saveState();
+      throw new Error("付款单已取消，请重新报名");
+    }
+    payment.codeUrl = codeUrl;
+    saveState();
+    return paymentResponse(payment);
+  })();
+  prepayRequests.set(payment.id, task);
+  try { return await task; } finally { prepayRequests.delete(payment.id); }
 }
 
-function decryptWechatResource(resource) {
-  if (!resource || resource.algorithm !== "AEAD_AES_256_GCM") throw new Error("微信支付通知加密算法不支持");
-  const encrypted = Buffer.from(String(resource.ciphertext || ""), "base64");
-  const key = Buffer.from(examWechatEnv("API_V3_KEY"), "utf8");
-  if (key.length !== 32) throw new Error("Native 支付 APIv3 密钥必须为 32 字节");
-  const decipher = crypto.createDecipheriv("aes-256-gcm", key, String(resource.nonce || ""));
-  if (typeof resource.associated_data === "string") decipher.setAAD(Buffer.from(resource.associated_data, "utf8"));
-  decipher.setAuthTag(encrypted.subarray(-16));
-  return JSON.parse(Buffer.concat([decipher.update(encrypted.subarray(0, -16)), decipher.final()]).toString("utf8"));
+async function closeCanceledNativePayment(payment) {
+  if (payment.status !== "canceled" || !payment.nativePrepayRequestedAt) return;
+  try { await wechatPay.close(payment.paymentNo); }
+  catch (error) {
+    if (error.code === "ORDER_NOT_EXIST" || error.code === "ORDERCLOSED") return;
+    if (error.code === "ORDERPAID") {
+      await reconcileWechatPayment(payment, { force: true });
+      if (payment.status === "paid") return;
+    }
+    throw error;
+  }
 }
 
 async function handleWechatNotify(headers, rawBody) {
-  if (!nativePayConfigured()) throw new Error("Native 支付回调配置不完整");
-  const timestamp = headers["wechatpay-timestamp"];
-  const nonce = headers["wechatpay-nonce"];
-  const signature = headers["wechatpay-signature"];
-  const serial = headers["wechatpay-serial"];
-  if (!timestamp || !nonce || !signature || !serial) throw new Error("微信支付通知签名头不完整");
-  const expectedSerial = examWechatEnv("PLATFORM_PUBLIC_KEY_ID");
-  if (expectedSerial && serial !== expectedSerial) throw new Error("微信支付平台公钥 ID 不匹配");
-  if (Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp)) > 300) throw new Error("微信支付通知已过期");
-  const message = `${timestamp}\n${nonce}\n${rawBody}\n`;
-  const valid = crypto.verify("RSA-SHA256", Buffer.from(message), examWechatPlatformPublicKey(), Buffer.from(signature, "base64"));
-  if (!valid) throw new Error("微信支付通知验签失败");
-  const transaction = decryptWechatResource(JSON.parse(rawBody).resource);
-  if (transaction.mchid !== examWechatEnv("MCH_ID")) throw new Error("微信支付商户号不匹配");
+  const transaction = wechatPay.notification(headers, rawBody);
   const payment = state.payments.find((item) => item.paymentNo === transaction.out_trade_no);
   if (!payment) throw new Error("付款单不存在");
-  if (Number(transaction.amount?.total) !== Math.round(payment.amount * 100)) throw new Error("付款金额不匹配");
-  if (transaction.trade_state === "SUCCESS") {
-    payment.status = "paid";
-    payment.confirmedAt = payment.confirmedAt || nowIso();
-    payment.paidAt = transaction.success_time || nowIso();
-    payment.wechatTransactionId = transaction.transaction_id || null;
-    saveState();
-  }
+  if (applyWechatTransaction(wechatPay, transaction, payment)) saveState();
 }
 
 function promoteDemoPayment(payment) {
@@ -424,7 +386,9 @@ function publicConfig() {
     totalScore: 100,
     scorePolicy: config.scorePolicy,
     multipleChoiceScoring: "多选全对才得分，多选、少选、错选均不得分。",
-    paymentInstructions: config.paymentInstructions,
+    paymentInstructions: "请用微信扫描本次订单二维码，付款成功后系统自动确认。请在 30 分钟内完成付款。",
+    paymentMode: "wechat_native",
+    nativePayReady: wechatPay.status.ready,
     contactText: config.contactText,
     demoAutoPay: DEMO_AUTO_PAY,
     blueprint: Object.entries(config.blueprint).map(([type, count]) => ({
@@ -597,6 +561,19 @@ async function handleApi(request, response, url) {
     const used = attemptsFor(key);
     if (used >= config.maxAttempts) return sendError(response, 403, `${config.maxAttempts} 次考试机会已全部使用`);
 
+    for (const native of state.payments.filter((item) => item.candidateKey === key && item.nativePrepayRequestedAt && !item.usedAt && item.status !== "paid")) {
+      try {
+        await reconcileWechatPayment(native, { force: true });
+        if (native.status === "paid") continue;
+        native.status = "canceled";
+        native.cancelReason = "answer_code_used";
+        native.canceledAt ||= nowIso();
+        native.codeUrl = null;
+        saveState();
+        await closeCanceledNativePayment(native);
+      } catch { return sendError(response, 503, "正在核对微信订单，请稍后再使用答题码"); }
+    }
+
     const existingPaid = state.payments
       .filter((payment) => payment.candidateKey === key && payment.status === "paid" && !payment.usedAt)
       .at(-1);
@@ -659,6 +636,14 @@ async function handleApi(request, response, url) {
     if (used >= config.maxAttempts) return sendError(response, 403, `${config.maxAttempts} 次考试机会已全部使用`);
     const attemptNumber = used + 1;
     const amount = feeForAttempt(attemptNumber);
+    const priorNative = state.payments.filter((item) => item.candidateKey === key && item.nativePrepayRequestedAt && !item.usedAt && item.status !== "paid").at(-1);
+    if (priorNative) {
+      try {
+        await reconcileWechatPayment(priorNative, { force: true });
+        await closeCanceledNativePayment(priorNative);
+      }
+      catch { return sendError(response, 503, "正在核对上一笔微信订单，请稍后重试"); }
+    }
     const existing = state.payments
       .filter((payment) => payment.candidateKey === key && ["pending", "paid"].includes(payment.status) && !payment.usedAt)
       .at(-1);
@@ -675,7 +660,7 @@ async function handleApi(request, response, url) {
     const confirmed = amount === 0 || DEMO_AUTO_PAY;
     const payment = {
       id: id("pay"),
-      paymentNo: `OEP${Date.now()}${crypto.randomBytes(4).toString("hex").toUpperCase()}`.slice(0, 32),
+      paymentNo: `JQCNE${Date.now()}${crypto.randomBytes(4).toString("hex").toUpperCase()}`.slice(0, 32),
       token: randomToken(),
       candidateKey: key,
       candidateName,
@@ -684,7 +669,7 @@ async function handleApi(request, response, url) {
       amount,
       attemptNumber,
       status: confirmed ? "paid" : "pending",
-      paymentChannel: amount === 0 ? "free" : "manual",
+      paymentChannel: amount === 0 ? "free" : "wechat_native",
       createdAt: nowIso(),
       expiresAt: new Date(Date.now() + 30 * 60_000).toISOString(),
       confirmedAt: confirmed ? nowIso() : null,
@@ -731,6 +716,7 @@ async function handleApi(request, response, url) {
     const token = url.pathname.split("/").at(-1);
     const payment = state.payments.find((item) => item.token === token);
     if (!payment) return sendError(response, 404, "付款申请不存在");
+    await reconcileWechatPayment(payment);
     if (expirePendingPayment(payment)) saveState();
     return sendJson(response, 200, paymentResponse(promoteDemoPayment(payment)));
   }
@@ -1064,7 +1050,9 @@ async function handleApi(request, response, url) {
     if (expirePendingPayment(payment)) saveState();
     if (payment.status === "canceled") return sendError(response, 409, "付款申请已取消，不能再确认");
     if (payment.status === "paid") return sendJson(response, 200, paymentResponse(payment));
+    if (payment.nativePrepayRequestedAt || (payment.paymentChannel === "wechat_native" && wechatPay.status.ready)) return sendError(response, 409, "微信订单须由到账通知或查单确认，请勿人工确认");
     payment.status = "paid";
+    payment.paymentChannel = "manual";
     payment.confirmedAt = nowIso();
     saveState();
     return sendJson(response, 200, paymentResponse(payment));
@@ -1183,6 +1171,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     expirePendingPayments();
     setInterval(() => expirePendingPayments(), 60_000).unref();
     console.log(`${config.clubName}${config.examTitle}已启动：http://localhost:${PORT}`);
+    if (!wechatPay.status.ready) console.log("微信收款待配置：" + wechatPay.status.missing.join("、"));
     if (ADMIN_PASSWORD === "admin123") console.log("管理员初始密码：admin123（部署前请设置 ADMIN_PASSWORD）");
   });
 }

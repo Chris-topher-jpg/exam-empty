@@ -6,3 +6,11 @@ data/question-bank.json
 node_modules/
 *.tar.gz
 .DS_Store
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx

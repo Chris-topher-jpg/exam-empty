@@ -53,10 +53,14 @@ python scripts/import-excel-bank.py 'content/机枪纯女文考.xlsx' content/qu
 - 题库维护、启停、分类筛选与组卷配置。
 - 报名次数、考试答卷、成绩复核、最高分和通过证明。
 - 答题码支持有效期、使用次数及可选收款统计。
-- 固定微信、支付宝收款码，管理员或财务核对后人工确认。
+- 微信 Native 订单二维码，自动核对到账、金额、商户和币种后解锁考试。
 - 付款申请 30 分钟自动取消，收款、通过率和最近 7 天趋势统计。
 
-默认收款图片沿用项目已有的 `public/payment-wechat.jpg` 和 `public/payment-alipay.jpg`。需要更换收款账户时，替换对应图片后重新部署。
+支付配置参考 `.env.example`。必须配置商户号、绑定 AppID、APIv3 密钥、商户证书序列号及私钥、微信支付公钥 ID 与公钥、公开 HTTPS 域名。配置不完整时付费页面不展示付款码，不回退到旧收款图片；首次免费和答题码正常使用。
+
+付款后通过验签、解密的到账通知确认，状态刷新会补充查单；重复通知不会重复计费，创建订单后不能人工确认。下单超时会查询原订单，复用相同商户订单号。密钥只存环境文件，PEM 可用文件路径或 BASE64 配置，禁止提交 Git。
+
+部署 Node.js 20.6+ 可使用 `node --env-file=.env server.js`；Linux systemd 使用 EnvironmentFile。运行 `node --env-file=.env scripts/check-wechat-config.mjs` 可检查配置，不输出密钥。
 
 ## 数据与部署
 

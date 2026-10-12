@@ -1,9 +1,12 @@
+import qrcode from './qrcode-generator.mjs';
+
 const state = {
   config: null,
   payment: null,
   candidate: null,
   poller: null,
   refreshingPayment: false,
+  preparingPayment: false,
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -70,7 +73,7 @@ async function lookupStatus(candidateId) {
   return status;
 }
 
-function showPayment(payment) {
+async function showPayment(payment) {
   state.payment = payment;
   $('#setupView').classList.add('hidden');
   $('#paymentView').classList.remove('hidden');
@@ -78,21 +81,68 @@ function showPayment(payment) {
   $('#paymentCandidate').textContent = payment.candidateName;
   $('#paymentAttempt').textContent = `第 ${payment.attemptNumber} 次考试`;
   $('#paymentId').textContent = payment.id.slice(-12);
-  $('#paymentWechatQr').src = "/payment-wechat.jpg";
-  $('#paymentAlipayQr').src = "/payment-alipay.jpg";
+  clearPaymentQr();
   updatePaymentStatus(payment);
   window.scrollTo({ top: $('#paymentView').offsetTop - 20, behavior: 'smooth' });
+  if (payment.status === 'pending') await preparePaymentQr();
+}
+
+function clearPaymentQr(message = '正在准备付款二维码…') {
+  $('#paymentWechatQr').classList.add('hidden');
+  $('#paymentWechatQr').removeAttribute('src');
+  $('#savePaymentQr').classList.add('hidden');
+  $('#savePaymentQr').removeAttribute('href');
+  $('#paymentQrMessage').textContent = message;
+}
+
+function renderPaymentQr(payment) {
+  if (payment.status !== 'pending' || !payment.codeUrl) return;
+  const qr = qrcode(0, 'M');
+  qr.addData(payment.codeUrl);
+  qr.make();
+  const source = qr.createDataURL(6, 24);
+  $('#paymentWechatQr').src = source;
+  $('#paymentWechatQr').classList.remove('hidden');
+  $('#savePaymentQr').href = source;
+  $('#savePaymentQr').classList.remove('hidden');
+  $('#paymentQrMessage').textContent = '用微信扫一扫；手机可保存后从相册识别';
+}
+
+async function preparePaymentQr() {
+  const token = state.payment?.token;
+  if (!token || state.payment.status !== 'pending') return;
+  if (!state.config.nativePayReady) {
+    clearPaymentQr('微信收款尚未开通，请联系考官或使用答题码');
+    return;
+  }
+  state.preparingPayment = true;
+  try {
+    const payment = await api('/api/payment/native-prepay', { method: 'POST', body: JSON.stringify({ token }) });
+    if (state.payment?.token !== token) return;
+    state.payment = payment;
+    updatePaymentStatus(payment);
+    renderPaymentQr(payment);
+  } catch (error) {
+    if (state.payment?.token !== token) return;
+    clearPaymentQr('二维码生成失败，点击“重试微信付款”');
+    notice($('#paymentNotice'), error.message, 'error');
+    $('#refreshPaymentButton').textContent = '重试微信付款';
+  } finally {
+    state.preparingPayment = false;
+  }
 }
 
 function updatePaymentStatus(payment) {
   const status = $('#paymentStatus');
   const button = $('#refreshPaymentButton');
   if (payment.status === 'paid') {
+    clearPaymentQr('付款成功');
     status.textContent = '已确认';
     status.className = 'paid';
     notice($('#paymentNotice'), '付款已确认，可以开始答题。', 'success');
     button.textContent = '进入考试';
   } else if (payment.status === 'canceled') {
+    clearPaymentQr('订单已过期，请重新报名');
     status.textContent = '已取消';
     status.className = 'canceled';
     notice($('#paymentNotice'), payment.cancelReason === 'fee_policy_changed' ? '收费规则已更新，请重新报名查看本次费用。' : '付款申请已超过 30 分钟并自动取消，请重新发起。', 'error');
@@ -100,13 +150,13 @@ function updatePaymentStatus(payment) {
   } else {
     status.textContent = '等待确认';
     status.className = 'pending';
-    notice($('#paymentNotice'), state.config.demoAutoPay ? '演示模式已自动确认付款。' : '请扫码付款，完成后点击“我已付款，刷新状态”。', 'warn');
-    button.textContent = '我已付款，刷新状态';
+    notice($('#paymentNotice'), state.config.nativePayReady ? '请用微信扫码付款，到账后自动解锁考试。' : '微信收款尚未开通，请联系考官或使用答题码。', 'warn');
+    button.textContent = payment.codeUrl ? '我已付款，刷新状态' : '重试微信付款';
   }
 }
 
 async function refreshPayment({ interactive = false } = {}) {
-  if (!state.payment || state.refreshingPayment) return;
+  if (!state.payment || state.refreshingPayment || state.preparingPayment) return;
   state.refreshingPayment = true;
   const button = $('#refreshPaymentButton');
   if (interactive) {
@@ -115,7 +165,9 @@ async function refreshPayment({ interactive = false } = {}) {
     button.setAttribute('aria-busy', 'true');
   }
   try {
-    const payment = await api(`/api/payment/status/${state.payment.token}`);
+    const token = state.payment.token;
+    const payment = await api(`/api/payment/status/${token}`);
+    if (state.payment?.token !== token) return;
     state.payment = payment;
     updatePaymentStatus(payment);
     if (payment.status !== 'pending') {
@@ -227,7 +279,7 @@ $('#candidateForm').addEventListener('submit', async (event) => {
       await beginExam(submitButton, $('#candidateStatus'));
       return;
     }
-    showPayment(payment);
+    await showPayment(payment);
     if (payment.status === 'pending') {
       clearInterval(state.poller);
       state.poller = setInterval(() => void refreshPayment(), 5000);
@@ -262,6 +314,7 @@ $('#refreshPaymentButton').addEventListener('click', async () => {
   }
   await refreshPayment({ interactive: true });
   if (state.payment?.status === 'paid') await beginExam();
+  else if (state.payment?.status === 'pending' && !state.payment.codeUrl) await preparePaymentQr();
 });
 
 $('#backToFormButton').addEventListener('click', () => {

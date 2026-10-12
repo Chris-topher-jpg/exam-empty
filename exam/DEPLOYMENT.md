@@ -11,13 +11,13 @@ Node.js 20+。没有第三方 npm 依赖，直接在 exam 目录运行 `node ser
 参考 `.env.example`，通过进程环境或 systemd 的 EnvironmentFile 加载；程序不自动读取 .env。
 
 - `HOST=127.0.0.1`：由反向代理访问。
-- `PORT=8080`：生产内网端口，开发默认 3000。
+- `PORT=3000`：模板的应用内网端口，Nginx 预览入口为 8080。实际独立服务可配置其他未占用的端口。
 - `ADMIN_PASSWORD`：首次创建所有者的强密码。
 - `RELEASE_REVISION`：当前 Git 提交号，可通过 `/api/health` 检查。
 - `ONBOARDING_EXAM_PUBLIC_URL`：你实际配置的公开域名。
 - `ONBOARDING_EXAM_STATE_PATH`、`ONBOARDING_EXAM_CONFIG_PATH`、`ONBOARDING_EXAM_ADMIN_USERS_PATH`、`ONBOARDING_EXAM_QUESTION_BANK_PATH`：持久化业务数据位置。
 
-`DEMO_AUTO_PAY=1` 仅用于本地演示；正式环境关闭。固定收款码需要管理员人工核对到账。
+`DEMO_AUTO_PAY=1` 仅用于本地演示；正式环境关闭。微信收款需配置 `.env.example` 的全部微信变量和公网 HTTPS 回调地址。详见 [README.md](README.md) 的微信支付说明。
 
 ## 数据初始化与更新
 
