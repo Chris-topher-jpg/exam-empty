@@ -130,8 +130,11 @@ export class WechatPay {
     if (transaction.mchid !== this.config.mchId || transaction.appid !== this.config.appId || transaction.out_trade_no !== payment.paymentNo) throw new Error("微信支付订单信息不匹配");
     // WeChat omits trade_type on some unpaid orders; successful transactions must include it.
     if ((transaction.trade_state === "SUCCESS" || transaction.trade_type !== undefined) && transaction.trade_type !== "NATIVE") throw new Error("微信支付类型不匹配");
+    // CLOSED, NOTPAY and other non-successful query states may omit amount/currency.
+    // They can never unlock an exam, so only successful transactions need payment validation.
+    if (transaction.trade_state !== "SUCCESS") return;
     if (transaction.amount?.total !== Math.round(payment.amount * 100) || transaction.amount?.currency !== "CNY" || payment.amount <= 0) throw new Error("微信支付金额或币种不匹配");
-    if (transaction.trade_state === "SUCCESS" && (!transaction.transaction_id || !Number.isFinite(Date.parse(transaction.success_time)))) throw new Error("微信支付成功信息无效");
+    if (!transaction.transaction_id || !Number.isFinite(Date.parse(transaction.success_time))) throw new Error("微信支付成功信息无效");
   }
 }
 

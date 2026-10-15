@@ -10,6 +10,8 @@ const platform = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
 const realFetch = globalThis.fetch;
 let server, baseUrl, directory, nativeCalls = 0, closeCalls = 0, queryPaid = false;
 let createdOrder, timeoutNext = false;
+const orders = new Map();
+const closedOrders = new Set();
 const mchId = "1749813950", appId = "wx0b31e1882e06de07", apiV3Key = "x".repeat(32), publicKeyId = "PUB_KEY_ID_123";
 function headers(raw) {
   const timestamp = Math.floor(Date.now() / 1000).toString(), nonce = "signed-test";
@@ -55,17 +57,22 @@ before(async () => {
     assert.ok(url.startsWith("https://api.mch.weixin.qq.com/"));
     if (url.endsWith("/close")) {
       closeCalls++;
+      closedOrders.add(decodeURIComponent(new URL(url).pathname.split("/").at(-2)));
       return new Response(null, { status: 204, headers: headers("") });
     }
     if (url.endsWith("/native")) {
       nativeCalls++;
       createdOrder = JSON.parse(options.body);
+      orders.set(createdOrder.out_trade_no, createdOrder);
       if (timeoutNext) { timeoutNext = false; throw new DOMException("timeout", "TimeoutError"); }
       const raw = JSON.stringify({ code_url: "weixin://wxpay/bizpayurl?pr=mock-api" });
       await new Promise((resolve) => setTimeout(resolve, 20));
       return new Response(raw, { headers: headers(raw) });
     }
-    const raw = JSON.stringify(success(createdOrder, queryPaid ? {} : { trade_state: "NOTPAY", trade_type: undefined, transaction_id: undefined, success_time: undefined }));
+    const paymentNo = decodeURIComponent(new URL(url).pathname.split("/").at(-1));
+    const raw = JSON.stringify(success(orders.get(paymentNo), closedOrders.has(paymentNo)
+      ? { trade_state: "CLOSED", trade_type: undefined, amount: undefined, transaction_id: undefined, success_time: undefined }
+      : queryPaid ? {} : { trade_state: "NOTPAY", trade_type: undefined, transaction_id: undefined, success_time: undefined }));
     return new Response(raw, { headers: headers(raw) });
   };
   ({ server } = await import("../server.js"));
@@ -114,7 +121,7 @@ test("query recovers a successful payment when a prepay request timed out", asyn
   assert.equal(nativeCalls, orderCount);
 });
 
-test("redeeming an answer code closes the unpaid Native order before granting an alternative", async () => {
+test("a closed Native order after answer-code redemption does not block the third paid attempt", async () => {
   queryPaid = false;
   const payment = await candidate("wechat-close-for-code");
   await request("/api/payment/native-prepay", { token: payment.token });
@@ -127,4 +134,15 @@ test("redeeming an answer code closes the unpaid Native order before granting an
   const canceled = await request(`/api/payment/status/${payment.token}`);
   assert.equal(canceled.data.status, "canceled");
   assert.equal(canceled.data.codeUrl, null);
+  const secondExam = await request("/api/exams/start", { paymentToken: redeemed.data.token });
+  assert.equal(secondExam.status, 201);
+  const thirdPayment = await request("/api/payment/request", { candidateName: "支付测试", candidateId: "wechat-close-for-code" });
+  assert.equal(thirdPayment.status, 201);
+  assert.equal(thirdPayment.data.attemptNumber, 3);
+  assert.equal(thirdPayment.data.amount, 30);
+  assert.equal(thirdPayment.data.status, "pending");
+  const thirdPrepay = await request("/api/payment/native-prepay", { token: thirdPayment.data.token });
+  assert.equal(thirdPrepay.status, 200);
+  assert.ok(thirdPrepay.data.codeUrl);
+  assert.equal((await request("/api/exams/start", { paymentToken: thirdPayment.data.token })).status, 403);
 });

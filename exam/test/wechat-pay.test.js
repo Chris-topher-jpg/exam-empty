@@ -81,13 +81,14 @@ test("signed notification decrypts and updates payment only once, including a la
 
 test("wrong merchant, AppID, amount, currency, order or transaction cannot unlock an exam", () => {
   const client = new WechatPay(config, { now: () => now });
-  for (const overrides of [{ mchid: "wrong" }, { appid: "wrong" }, { out_trade_no: "wrong" }, { trade_type: "JSAPI" }, { amount: { total: 1, currency: "CNY" } }, { amount: { total: 2000, currency: "USD" } }, { transaction_id: "" }]) {
+  for (const overrides of [{ mchid: "wrong" }, { appid: "wrong" }, { out_trade_no: "wrong" }, { trade_type: "JSAPI" }, { amount: undefined }, { amount: { total: 1, currency: "CNY" } }, { amount: { total: 2000, currency: "USD" } }, { transaction_id: "" }]) {
     const order = payment();
     assert.throws(() => applyWechatTransaction(client, transaction(overrides), order));
     assert.equal(order.status, "pending");
   }
   assert.equal(applyWechatTransaction(client, transaction({ trade_state: "NOTPAY" }), payment()), false);
   assert.equal(applyWechatTransaction(client, transaction({ trade_state: "NOTPAY", trade_type: undefined }), payment()), false);
+  assert.equal(applyWechatTransaction(client, transaction({ trade_state: "CLOSED", trade_type: undefined, amount: undefined }), payment()), false);
   assert.throws(() => applyWechatTransaction(client, transaction({ trade_type: undefined }), payment()));
 });
 
